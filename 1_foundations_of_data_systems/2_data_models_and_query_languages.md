@@ -27,7 +27,6 @@ Benefits:
 So which is better? Well, it depends on your data and how you expect it to be queried. This is a refrain you’ll hear a lot in this book!
 
 #### Schema flexibility and data locality
-
 Relational databases enforce a strict schema on their contents. Document databases don’t - you can add arbitrary keys and values. This doesn’t quite make them _schemaless_, because the application code usually has to do the job of enforcing some kind of structure. The book recommends calling document databases “schema on read”, and relational databases “schema on write”. It’s like runtime vs compile-time type checking.
 
 What happens when you need to change the schema? In a document db, the application code has to remember the old schema for all time (!) and automatically translate for old records. [Surely that can’t be right!] In a relational db, you run a _migration_ that alters the table. Runs in a few ms on most relational db systems, but can be orders-of-magnitude slower on MySQL.
@@ -41,7 +40,6 @@ In a document db you need to load the whole document from the same place for rea
 With relational dbs supporting JSON or XML storage, and document dbs beginning to support relational-like joins, the book suggests that the relational and document models are beginning to merge a little bit, which makes sense: if you can store the relational-like bits of your data in a relational db, and the document-like bits of your data in a document db, it’s convenient for them to be the same db!
 
 #### Query languages for Data
-
 Remember the network model? Queries had to be imperative, since they specified a particular access path. “Look here, then there, then there, then return that record”. In a relational model, queries can be _declarative_. `SELECT * FROM animals WHERE family = ‘sharks’` doesn’t tell the db how to get the data - the query optimizer handles all of that. This means (a) that you don’t have to do the work, (b) that the query optimizer can improve over time and you’ll automatically reap the benefits, and (c) that the work can be more easily parallelized.
 
 Declarative query languages are nicer in lots of places. Compare the ease of styling in CSS compared to having to manually set the style attributes in JS.
@@ -55,7 +53,6 @@ Advantages: you have a lot more options about what you want to do with your quer
 MongoDB also supports expressing your map and reduce steps more declaratively, as a raw object instead of a pair of functions. The book suggests that this is effectively re-inventing SQL.
 
 #### Graph-like Data Models
-
 If essentially all your data is in a many-to-many relationship, it becomes more natural to model your data as a graph: for instance, points in a road network, or websites linked by HTML links.
 
 You could represent a graph store in a relational db by having a vertices table and an edges table, with a many-to-many relationship. Any vertex can be connected to any other vertex, and that connection - that edge - can be labeled according to its relationship.

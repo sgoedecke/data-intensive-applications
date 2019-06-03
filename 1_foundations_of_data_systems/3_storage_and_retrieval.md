@@ -63,13 +63,11 @@ LSM trees have a failure mode where compaction can’t keep up with writes and e
 B-trees have only one instance of each key, while LSM trees can have multiple copies of a key in different segments. This makes it easier for B-trees to lock keys.
 
 #### What values go in the tree?
-
 What do you put as the value under the key in your B-tree or LSM-tree? It could be the whole db row (here the key would be a primary key or ID). This is known as a _clustered index_. Or it could be a pointer to a place in a giant heap file (though here it’s hard if the record grows substantially and has to be moved within the file - you either have to update all indexes or leave a forwarding pointer at the old location). Or it can be _some_ fields in the row, to make certain popular lookups easier, and a pointer to a heap file for everything else. This is known as a _covering index_, since the index itself covers some queries.
 
 [Skipping some notes on multi-column indexes, coordinate indexes, and fuzzy search]
 
 #### In-memory databases
-
 Both B-trees and LSM-trees are ways to get around the limitations of disks. Memory is fast and reliable, while disks are slow and contain many other failure modes. We use disks because they’re cheaper, and because they retain data when turned off accidentally.
 
 For data stores that don’t need to retain data, like caches, it makes sense to operate entirely in memory (see Memcached) and never write to disk.
@@ -86,7 +84,6 @@ Since they don’t need to serialize [as much], in-memory dbs can store more com
 It’s even possible for an in-memory db to store more data than available RAM - the db can evict rarely-used data to disk and read it back in when it’s accessed, like the OS does with virtual memory/swap files. The index will still need to fit entirely in memory, though.  [Is this really an in-memory DB at that point?]
 
 ### Transaction Processing or Analytics?
-
 Two very different models of db use: transactional or analytic. Transactional use generally operates on a small set of related records (e.g. a user’s purchases and buyer profile), and must be atomic (if you fail to purchase X, you need to cancel the whole order). Analytic use operates on a large set of unrelated records (e.g. all users’ purchase history) and can return partial results in the case of failure.
 
 CRUD applications tend to be transaction processing systems, while analytics applications (like GA or Hive) tend to be analytic. The systems differ because you can’t easily optimize a db for both usage patterns at the same time. Latency and availability matter much more for the application than they do for the analyst.
@@ -96,7 +93,6 @@ Most large companies have a separate data warehouse for analytics. Some service 
 [Skipping section on a “fact-table” schema for data warehousing]
 
 #### Column-oriented storage
-
 Transactional storage engines are designed for the whole record to be read back at the same time. If you care about a particular customer’s name, you likely care about their location/purchases/etc at the same time. In contrast, analytic storage engines usually only care about a small subset of columns across the whole data set (all the names and locations of all users, but nothing else).
 
 To make these queries faster, the storage engine use a columnar layout: instead of storing all customer records in one (maybe segmented) file, store all customer _names_ in one file, _locations_ in another, etc. The nth row in one file will be the same customer as the nth row in another.
@@ -108,5 +104,4 @@ Columnar layout can make compression easier as well, because single-column data 
 Writing to columnar storage is tricky because you can’t update a record in place without decompressing the whole column (and if it’s sorted, all the other column files, since the only identifier is position!) The solution is to use a LSM-tree: an in-memory sorted data structure that can receive new writes, then write them out in bulk periodically [which presumably does require decompressing a bunch of files]. Like a LSM-tree, read queries need to check the in-memory data as well as the disk data, but the query optimizer can do this in the background.
 
 #### Materialized aggregates
-
 Many analytic queries will be performing the same aggregates (counting or summing records). One way to cache these is a _materialized view_ - a table-like object whose contents are the results of some query. It differs from a virtual view because the data is actually query results written to disk, rather than a query waiting to be run. Every time the data changes, the materialized view needs to be updated (so be careful about adding too many!)
