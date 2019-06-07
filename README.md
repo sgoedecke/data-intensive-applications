@@ -18,3 +18,11 @@ A lower-level discussion of how to store data efficiently. Mostly about the trad
 
 ### Encoding and evolution
 Goes into more detail about what "writing data to disk" means. Covers a bunch of ways to encode data to disk, from JSON to binary formats like Avro, and what tradeoffs each of these approaches make.
+
+## Part 2: Distributed Data
+
+Why distribute data? So that you can handle more data that fits on a single node, or keep working if a node dies, or serve data from nodes closer to where your users live. Making individual nodes bigger is easier but only addresses the first concern. This chapter deals with cases where you're scaling horizontally: many small nodes.
+
+### Replication
+Discusses the purpose and pitfalls of replicating data. Compares three main approaches to replication: single leader, multi leader, and leaderless. Describes three consistency requirements databases might fulfil - read-after-write, monotonic reads, and consistent-prefix reads - and how to get them. Anything other than single leader replication turns out to be very difficult to get right.
+
